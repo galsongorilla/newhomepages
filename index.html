@@ -352,7 +352,7 @@
 
   <script>
     // ※ 本番用GAS URLに差し替えてください
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzbAE7RpVLxZHjSMSNEOeCikVyJWWtRuv7gRBPVU8Us-q1k-gnuOW84cmy4qBec-A1q/exec"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzWvPAOPeUmWNtz4oCTVXo2hQiq9Ap47j3yDc_vWFgHJqfiTL-LanbB-R0BoIKruKc9/exec"; 
 
     // テーブルのデータ (TakeOut含む)
     const tables = [
@@ -366,7 +366,7 @@
       { id: "T6", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
       { id: "T7", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
       { id: "T8", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
-{ id: "TakeOut", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
+      { id: "TakeOut", isActive: false, total: 0, startTime: null, history: [], customerInfo: { age: [], male: 0, female: 0 } },
     ];
 
     let menuData = {};
@@ -393,7 +393,7 @@
     // ★追加・復活：サーバーから最新の卓状況を取得する関数
     async function fetchTables() {
       try {
-        const res = await fetch(`${GAS_URL}?action=getTables`);
+        const res = await fetch(`${GAS_URL.trim()}?action=getTables`);
         const serverTables = await res.json();
         if (serverTables && serverTables.length > 0) {
           serverTables.forEach(st => {
@@ -414,7 +414,7 @@
 
     // ★追加・復活：変更があった卓の情報をサーバーに送信する関数
     function syncTableState(tableData) {
-      fetch(GAS_URL, {
+      fetch(GAS_URL.trim(), {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain" },
@@ -422,16 +422,13 @@
       }).catch(e => console.error(e));
     }
 
-    // 10秒ごとに自動で最新状態を取得して同期（ログアウト現象防止）
-    setInterval(fetchTables, 10000);
-
     // メニューデータをGASから取得
     async function fetchMenu() {
       const btn = document.querySelector('#loginScreen button');
       btn.disabled = true;
       btn.innerText = "メニュー取得中...";
       try {
-        const res = await fetch(`${GAS_URL}?action=getMenu`);
+        const res = await fetch(`${GAS_URL.trim()}?action=getMenu`);
         const data = await res.json();
         if(data.status === "success") {
           menuData = data.menu;
@@ -439,6 +436,9 @@
           
           // ★メニュー取得後に卓状態も初回取得する
           await fetchTables();
+
+          // ★通信の衝突を防ぐため、メニュー取得が成功してから10秒ループを開始
+          setInterval(fetchTables, 10000);
 
           btn.disabled = false;
           btn.innerText = "次へ";
@@ -700,7 +700,7 @@
         syncTableState(tbl);
 
         // バックグラウンドでGASへ送信
-        await fetch(GAS_URL, {
+        await fetch(GAS_URL.trim(), {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
@@ -756,7 +756,7 @@
         };
 
         // データ送信
-        await fetch(GAS_URL, {
+        await fetch(GAS_URL.trim(), {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
@@ -1066,7 +1066,7 @@
       btn.innerText = "送信中...";
 
       try {
-        await fetch(GAS_URL, {
+        await fetch(GAS_URL.trim(), {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
@@ -1080,9 +1080,9 @@
           cart.forEach(item => {
             const existing = tbl.history.find(h => h.name === item.name);
             if (existing) {
-              existing. count += item. count;
+              existing.count += item.count;
             } else {
-              tbl. history.push({name: item.name, count: item.count, price: item.price, category: item.category});
+              tbl.history.push({name: item.name, count: item.count, price: item.price, category: item.category});
             }
           });
           
