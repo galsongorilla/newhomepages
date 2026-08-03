@@ -1080,9 +1080,9 @@
           cart.forEach(item => {
             const existing = tbl.history.find(h => h.name === item.name);
             if (existing) {
-              existing.count += item.count;
+              existing. count += item. count;
             } else {
-              tbl.history.push({name: item.name, count: item.count, price: item.price, category: item.category});
+              tbl. history.push({name: item.name, count: item.count, price: item.price, category: item.category});
             }
           });
           
