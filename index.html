@@ -377,7 +377,7 @@
     let cart = []; 
     
     let selectedPayment = "";
-    let checkoutTotalAmount = 0; // 10%上乗せ計算用
+    let checkoutTotalAmount = 0;
 
     // アイス味選択用変数
     const iceFlavors = ['バニラ', 'チョコレート', 'ストロベリー', 'ブルーウェーブ', '塩ちんすこう', 'マンゴー', '紅芋'];
@@ -712,7 +712,7 @@
       }
     }
 
-    // --- 決済処理 (10%加算ロジック実装済み) ---
+    // --- 決済処理 ---
     function selectPayment(method) {
       selectedPayment = method;
       document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('selected'));
@@ -723,15 +723,8 @@
       const baseTotal = tbl ? tbl.total : 0;
       const totalDisplay = document.getElementById('checkoutTotal');
 
-      if (method === '現金') {
-        checkoutTotalAmount = baseTotal;
-        totalDisplay.innerHTML = `${checkoutTotalAmount.toLocaleString()}<span class="text-2xl font-bold ml-1">円</span>`;
-      } else {
-        // 現金以外は10%増し（端数切り捨て）
-        checkoutTotalAmount = Math.floor(baseTotal * 1.1);
-        totalDisplay.innerHTML = `${checkoutTotalAmount.toLocaleString()}<span class="text-2xl font-bold ml-1">円</span>
-                                  <div class="text-sm text-red-500 mt-2 font-bold tracking-wider">※現金以外10%加算</div>`;
-      }
+      checkoutTotalAmount = baseTotal;
+      totalDisplay.innerHTML = `${checkoutTotalAmount.toLocaleString()}<span class="text-2xl font-bold ml-1">円</span>`;
     }
 
     async function processCheckout() {
@@ -748,7 +741,7 @@
           action: "checkout",
           tableNo: selectedTable.id,
           staff: currentStaff,
-          totalAmount: checkoutTotalAmount, // 上乗せ計算後の金額を送信！
+          totalAmount: checkoutTotalAmount, // 決済金額を送信
           paymentMethod: selectedPayment,
           maleCount: tbl && tbl.customerInfo ? tbl.customerInfo.male : 0,
           femaleCount: tbl && tbl.customerInfo ? tbl.customerInfo.female : 0,
